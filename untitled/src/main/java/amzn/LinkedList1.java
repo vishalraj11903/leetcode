@@ -14,7 +14,7 @@ class Node {
         this.random = null;
     }
 }
-public class LinkedList {
+public class LinkedList1 {
     Node head;
 
     public void add(int data) {
@@ -49,9 +49,9 @@ public class LinkedList {
         return sb.toString();
     }
 
-    public static LinkedList deserialize(String serialized) {
+    public static LinkedList1 deserialize(String serialized) {
         String[] nodes = serialized.split(",");
-        LinkedList linkedList = new LinkedList();
+        LinkedList1 linkedList = new LinkedList1();
         Node[] nodeArray = new Node[nodes.length / 2];
         for (int i = 0; i < nodes.length; i += 2) {
             Node newNode = new Node(Integer.parseInt(nodes[i]));
@@ -68,7 +68,7 @@ public class LinkedList {
     }
 
     public static void main(String[] args) {
-        LinkedList linkedList = new LinkedList();
+        LinkedList1 linkedList = new LinkedList1();
         linkedList.add(1);
         linkedList.add(2);
         linkedList.add(3);
@@ -79,7 +79,7 @@ public class LinkedList {
         String serialized = linkedList.serialize();
         System.out.println("Serialized: " + serialized);
 
-        LinkedList deserializedLinkedList = LinkedList.deserialize(serialized);
+        LinkedList1 deserializedLinkedList = LinkedList1.deserialize(serialized);
         System.out.print("Deserialized: ");
         Node current = deserializedLinkedList.head;
         while (current != null) {

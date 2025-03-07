@@ -20,13 +20,15 @@ public class StockTracker {
 
     public void addStockPrice(int price) {
         // Add price to the queue
-        stockPrices.offer(price);
+       // stockPrices.offer(price);
 
         // Maintain decreasing order in maxDeque
         while (!maxDeque.isEmpty() && maxDeque.peekLast() < price) {
             maxDeque.pollLast();
         }
         maxDeque.offerLast(price);
+
+        
 
         // Remove the oldest price if we exceed K elements
        /* if (stockPrices.size() > K) {
