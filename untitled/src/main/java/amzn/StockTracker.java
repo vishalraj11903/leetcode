@@ -28,7 +28,7 @@ public class StockTracker {
         }
         maxDeque.offerLast(price);
 
-        
+
 
         // Remove the oldest price if we exceed K elements
        /* if (stockPrices.size() > K) {

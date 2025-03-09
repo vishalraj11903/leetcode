@@ -2,35 +2,32 @@ package practice;
 
 public class WoodCut {
     public static void main(String... args) {
-        int[] wood = {232,124, 456};
-        int k = 7;
+        int[] wood = {5, 9, 7};
+        int k = 3;
         int right = 0;
         for (int i = 0; i < wood.length; ++i) {
             right  = Math.max(wood[i], right);
         }
 
         int left = 1;
-        int res = 0;
         while (left < right) {
-            int mid = left +(right - left) / 2;
-            if (canCut(wood, mid) >= k) {
+            int mid = left + (right - left) / 2;
+            if (canCut(wood, mid) > k) {
                 left = mid + 1;
-                res = left;
             } else {
                 right = mid;
             }
         }
 
-        System.out.println(res);
+        System.out.println(left);
 
     }
 
-    static int canCut(int[] wood, int len) {
+    static int canCut(int[] wood, int k) {
         int total = 0;
         for (int val : wood) {
-            total += (val / len);
+            total += (val / k);
         }
-
         return total;
     }
 

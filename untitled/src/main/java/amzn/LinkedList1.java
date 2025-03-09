@@ -2,92 +2,150 @@ package amzn;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 class Node {
-    int data;
+    int val;
     Node next;
     Node random;
 
     public Node(int data) {
-        this.data = data;
+        this.val = data;
         this.next = null;
         this.random = null;
     }
 }
 public class LinkedList1 {
-    Node head;
-
-    public void add(int data) {
-        Node newNode = new Node(data);
+    // Serialize to string
+    public static String serialize(Node head) {
         if (head == null) {
-            head = newNode;
-        } else {
-            Node current = head;
-            while (current.next != null) {
-                current = current.next;
-            }
-            current.next = newNode;
+            return "";
         }
-    }
 
-    public String serialize() {
-        Map<Node, Integer> nodeMap = new HashMap<>();
-        StringBuilder sb = new StringBuilder();
+        Map<Node, Integer> nodeToIndex = new HashMap<>();
         Node current = head;
         int index = 0;
+
         while (current != null) {
-            nodeMap.put(current, index);
-            sb.append(current.data).append(",");
-            if (current.random != null) {
-                sb.append(nodeMap.get(current.random)).append(",");
-            } else {
-                sb.append("-1,");
-            }
+            nodeToIndex.put(current, index);
             current = current.next;
             index++;
         }
-        return sb.toString();
+
+        current = head;
+        StringJoiner joiner = new StringJoiner(",");
+
+        while (current != null) {
+            int randomIdx = (current.random != null) ? nodeToIndex.get(current.random) : -1;
+            joiner.add(current.val + ":" + randomIdx);
+            current = current.next;
+        }
+
+        return joiner.toString();
     }
 
-    public static LinkedList1 deserialize(String serialized) {
-        String[] nodes = serialized.split(",");
-        LinkedList1 linkedList = new LinkedList1();
-        Node[] nodeArray = new Node[nodes.length / 2];
-        for (int i = 0; i < nodes.length; i += 2) {
-            Node newNode = new Node(Integer.parseInt(nodes[i]));
-            nodeArray[i / 2] = newNode;
-            if (i / 2 > 0) {
-                nodeArray[i / 2 - 1].next = newNode;
+    static String ser(Node head) {
+        Node current = head;
+        Map<Node, Integer> map = new HashMap<>();
+        int index = 0;
+        while (current != null) {
+            map.put(current, index++);
+            current = current.next;
+        }
+
+        StringJoiner joiner = new StringJoiner(",");
+        current = head;
+        while (current != null) {
+            int rnd = current.random == null ? -1 : map.get(current.random);
+            joiner.add(current.val + ":" + rnd);
+            current = current.next;
+        }
+
+        return joiner.toString();
+    }
+
+    static Node des(String input) {
+        String[] stringNodes = input.split(",");
+        Node[] nodes = new Node[stringNodes.length];
+
+        for (int i = 0; i < stringNodes.length; ++i) {
+            int val = Integer.valueOf(stringNodes[i].split(":")[0]);
+            nodes[i] = new Node(val);
+        }
+
+        for (int i = 0; i < stringNodes.length ; ++i) {
+            if (i < stringNodes.length - 1) {
+                nodes[i].next = nodes[i + 1];
             }
-            if (!nodes[i + 1].equals("-1")) {
-                newNode.random = nodeArray[Integer.parseInt(nodes[i + 1])];
+            int val = Integer.valueOf(stringNodes[i].split(":")[1]);
+            nodes[i].random = val == -1 ? null : nodes[val];
+        }
+
+        return nodes[0];
+    }
+
+    // Deserialize from string
+    public static Node deserialize(String s) {
+        if (s == null || s.isEmpty()) {
+            return null;
+        }
+
+        String[] parts = s.split(",");
+        Node[] nodes = new Node[parts.length];
+
+        for (int i = 0; i < parts.length; i++) {
+            String[] nodeData = parts[i].split(":");
+            nodes[i] = new Node(Integer.parseInt(nodeData[0]));
+        }
+
+        for (int i = 0; i < parts.length; i++) {
+            String[] nodeData = parts[i].split(":");
+            int randomIdx = Integer.parseInt(nodeData[1]);
+
+            if (i < parts.length -1) {
+                nodes[i].next = nodes[i+1];
+            }
+
+            if (randomIdx != -1) {
+                nodes[i].random = nodes[randomIdx];
             }
         }
-        linkedList.head = nodeArray[0];
-        return linkedList;
+
+        return nodes[0];
+    }
+
+    public static void printList(Node head) {
+        Node current = head;
+        while (current != null) {
+            System.out.print("Value: " + current.val + ", Random: " + (current.random != null ? current.random.val : "null") + " -> ");
+            current = current.next;
+        }
+        System.out.println("null");
     }
 
     public static void main(String[] args) {
-        LinkedList1 linkedList = new LinkedList1();
-        linkedList.add(1);
-        linkedList.add(2);
-        linkedList.add(3);
+        Node head = new Node(1);
+        Node node2 = new Node(2);
+        Node node3 = new Node(3);
+        Node node4 = new Node(4);
 
-        linkedList.head.next.random = linkedList.head; // set random pointer
-        linkedList.head.next.next.random = linkedList.head.next; // set random pointer
+        head.next = node2;
+        node2.next = node3;
+        node3.next = node4;
 
-        String serialized = linkedList.serialize();
+        head.random = node3;
+        node2.random = head;
+        node3.random = node4;
+        node4.random = node2;
+
+        System.out.println("Original List:");
+        printList(head);
+
+        String serialized = ser(head);
         System.out.println("Serialized: " + serialized);
 
-        LinkedList1 deserializedLinkedList = LinkedList1.deserialize(serialized);
-        System.out.print("Deserialized: ");
-        Node current = deserializedLinkedList.head;
-        while (current != null) {
-            System.out.print(current.data + " ");
-            if (current.random != null) {
-                System.out.print("(random: " + current.random.data + ") ");
-            }
-            current = current.next;
-        }
+        Node deserialized = des(serialized);
+        System.out.println("Deserialized List:");
+        printList(deserialized);
     }
 }
